@@ -1,0 +1,8 @@
+.superpowers/
+__pycache__/
+*.pyc
+.venv/
+venv/
+reports/
+config.yaml
+connections.csv
