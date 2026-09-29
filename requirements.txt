@@ -1,0 +1,6 @@
+PyYAML==6.0.2
+requests==2.32.3
+schedule==1.2.2
+beautifulsoup4==4.12.3
+pytest==8.3.3
+responses==0.25.3

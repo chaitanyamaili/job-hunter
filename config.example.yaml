@@ -1,0 +1,30 @@
+companies:
+  - name: Stripe
+  - name: Airbnb
+  - name: SomeStartup
+    ats: greenhouse
+    board_token: some-startup
+  - name: NicheCo
+    careers_url: https://niche.co/careers
+
+filters:
+  designations:
+    - "Software Engineer"
+    - "Backend"
+  locations:
+    - "Austin"
+    - "Remote"
+  workplace_types:
+    - remote
+    - hybrid
+  posted_within_days: 14
+  exclude_keywords:
+    - "Clearance required"
+    - "Staff"
+
+connections_csv: ./connections.csv
+
+output_dir: ./reports
+
+schedule:
+  interval: 6h
