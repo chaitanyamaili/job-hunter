@@ -79,6 +79,11 @@ def load_config(path: str | Path) -> Config:
     companies_raw = _require(data, "companies", "config.yaml")
     companies = []
     for entry in companies_raw:
+        if not isinstance(entry, dict):
+            raise ConfigError(
+                f"config.yaml: each companies entry must be a mapping with a 'name' "
+                f"field, got {entry!r}"
+            )
         name = _require(entry, "name", "a companies entry")
         companies.append(
             CompanyConfig(
@@ -100,17 +105,26 @@ def load_config(path: str | Path) -> Config:
                 f"'{workplace_type}'; expected one of {sorted(_VALID_WORKPLACE_TYPES)}"
             )
     posted_within_days = _require(filters_raw, "posted_within_days", "filters")
+    try:
+        posted_within_days = int(posted_within_days)
+    except (TypeError, ValueError) as exc:
+        raise ConfigError(
+            f"config.yaml: filters.posted_within_days must be a whole number, "
+            f"got {posted_within_days!r}"
+        ) from exc
     exclude_keywords = list(filters_raw.get("exclude_keywords", []))
 
     filters = FilterConfig(
         designations=list(designations),
         locations=list(locations),
         workplace_types=workplace_types,
-        posted_within_days=int(posted_within_days),
+        posted_within_days=posted_within_days,
         exclude_keywords=exclude_keywords,
     )
 
     connections_csv = _require(data, "connections_csv", "config.yaml")
+    if not Path(connections_csv).exists():
+        raise ConfigError(f"config.yaml: connections_csv not found: {connections_csv}")
     output_dir = _require(data, "output_dir", "config.yaml")
 
     schedule_raw = data.get("schedule", {})
