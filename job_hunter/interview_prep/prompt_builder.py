@@ -3,12 +3,25 @@ from __future__ import annotations
 from ..referrals import Connection
 from .extractor import JobPosting
 
+_SPARSE_DESCRIPTION_THRESHOLD = 200
+
 
 def build_prompt(
     posting: JobPosting,
     resume_text: str | None,
     referral: Connection | None,
 ) -> str:
+    if not posting.description_text:
+        description_block = "(description could not be reliably extracted)"
+    elif len(posting.description_text) < _SPARSE_DESCRIPTION_THRESHOLD:
+        description_block = (
+            f"{posting.description_text}\n\n"
+            "(Note: only a small amount of text could be extracted from this "
+            "posting, so the description above may be incomplete.)"
+        )
+    else:
+        description_block = posting.description_text
+
     lines = [
         "You are an experienced technical interview coach.",
         "",
@@ -17,7 +30,7 @@ def build_prompt(
         f"URL: {posting.url}",
         "",
         "### Job Description",
-        posting.description_text or "(description could not be reliably extracted)",
+        description_block,
         "",
     ]
 

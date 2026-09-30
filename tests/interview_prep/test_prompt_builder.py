@@ -52,3 +52,20 @@ def test_build_prompt_omits_referral_section_when_absent():
     prompt = build_prompt(_posting(), resume_text=None, referral=None)
 
     assert "Referral Contact" not in prompt
+
+
+def test_build_prompt_notes_sparse_description():
+    posting = _posting(description_text="Short blurb.")
+
+    prompt = build_prompt(posting, resume_text=None, referral=None)
+
+    assert "Short blurb." in prompt
+    assert "may be incomplete" in prompt
+
+
+def test_build_prompt_omits_sparse_note_for_substantial_description():
+    posting = _posting(description_text="A" * 500)
+
+    prompt = build_prompt(posting, resume_text=None, referral=None)
+
+    assert "may be incomplete" not in prompt
