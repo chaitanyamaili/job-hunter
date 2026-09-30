@@ -25,6 +25,14 @@ HEURISTIC_HTML = """
 </body></html>
 """
 
+GREENHOUSE_HEURISTIC_HTML = """
+<html><head><title>Job Application for Engineering Manager at GitLab</title></head>
+<body>
+<nav>Home</nav>
+<main><h1>Engineering Manager</h1><p>Join our platform team.</p></main>
+</body></html>
+"""
+
 
 @responses.activate
 def test_fetch_job_posting_prefers_json_ld():
@@ -49,6 +57,22 @@ def test_fetch_job_posting_falls_back_to_heuristic():
     assert posting.company == ""
     assert "We build scalable systems." in posting.description_text
     assert "Home" not in posting.description_text
+
+
+@responses.activate
+def test_fetch_job_posting_extracts_company_from_greenhouse_title_pattern():
+    responses.add(
+        responses.GET,
+        "https://job-boards.greenhouse.io/acme/jobs/1",
+        body=GREENHOUSE_HEURISTIC_HTML,
+        status=200,
+    )
+
+    posting = fetch_job_posting("https://job-boards.greenhouse.io/acme/jobs/1")
+
+    assert posting.title == "Engineering Manager"
+    assert posting.company == "GitLab"
+    assert "Join our platform team." in posting.description_text
 
 
 @responses.activate

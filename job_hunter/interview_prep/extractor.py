@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
@@ -69,10 +70,19 @@ def _extract_json_ld_posting(soup: BeautifulSoup, url: str) -> JobPosting | None
     return None
 
 
+_GREENHOUSE_TITLE_PATTERN = re.compile(r"^Job Application for (.+) at (.+)$")
+
+
 def _extract_heuristic_posting(soup: BeautifulSoup, url: str) -> JobPosting:
     title = ""
+    company = ""
     if soup.title and soup.title.string:
-        title = soup.title.string.strip()
+        raw_title = soup.title.string.strip()
+        match = _GREENHOUSE_TITLE_PATTERN.match(raw_title)
+        if match:
+            title, company = match.group(1).strip(), match.group(2).strip()
+        else:
+            title = raw_title
     else:
         heading = soup.find("h1")
         if heading:
@@ -80,7 +90,7 @@ def _extract_heuristic_posting(soup: BeautifulSoup, url: str) -> JobPosting:
 
     return JobPosting(
         title=title,
-        company="",
+        company=company,
         description_text=extract_visible_text(soup),
         url=url,
     )
