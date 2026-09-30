@@ -44,3 +44,30 @@ reaches the network step silently.
 2. Run `python main.py --once`.
 3. Confirm `reports/<timestamp>_job_matches.md` was created and lists real,
    current openings for that company.
+
+## Interview Prep Tool
+
+Given any job posting URL, `interview_prep.py` builds an interview-prep
+prompt (likely questions, topics to review, STAR-method answers) and,
+optionally, runs it through a local AI CLI you already have installed.
+
+```bash
+python interview_prep.py <job-posting-url>                # prompt only, printed + saved
+python interview_prep.py <job-posting-url> --agent claude  # also runs it through `claude -p`
+python interview_prep.py <job-posting-url> --agent gemini  # or `gemini -p`
+```
+
+Optional flags:
+- `--resume PATH_OR_URL` — local resume file or a URL to an HTML resume
+  page (default: `./resume.md`, skipped if absent). Copy
+  `resume.example.md` to `resume.md` and fill in your own experience so
+  STAR-method answers are grounded in real examples instead of generic
+  frameworks.
+- `--connections-csv PATH` — reuses the same connections file as the main
+  pipeline (default: `./connections.csv`) to flag a referral at the
+  posting's company, if one exists.
+- `--output-dir DIR` — where the markdown report is written (default:
+  `./reports/interview_prep`).
+
+Only `claude` and `gemini` are supported as `--agent` values right now —
+whichever CLIs you have installed locally.
